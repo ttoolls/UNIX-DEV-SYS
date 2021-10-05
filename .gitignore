@@ -1,5 +1,5 @@
-~.*
+*~
 *.so
 *.o
 a.out
-
+simple3
