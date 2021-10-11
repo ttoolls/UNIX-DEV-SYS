@@ -5,6 +5,8 @@
 #define HTTP_REQUEST_LEN 256
 #define HTTP_METHOD_LEN 6
 #define HTTP_URI_LEN 100
+#define HTTP_URI_PARAM_LEN 100
+ 
 
 #define REQ_END 100
 #define ERR_NO_URI -100
@@ -14,8 +16,8 @@ struct http_req {
 	char request[HTTP_REQUEST_LEN];
 	char method[HTTP_METHOD_LEN];
 	char uri[HTTP_URI_LEN];
-	// uri_path
-	// uri_params
+	char uri_path[HTTP_URI_LEN];
+	char uri_params[HTTP_URI_PARAM_LEN];
 	// version
 	// user_agent
 	// server
@@ -23,7 +25,7 @@ struct http_req {
 };
 
 int fill_req(char *buf, struct http_req *req) {
-	if (strlen(buf) == 2) {
+	if ((strlen(buf) == 2) && (buf[0] == '\r') && (buf[1] == '\n')) {
 		// пустая строка (\r\n) означает конец запроса
 		return REQ_END;
 	}
@@ -40,19 +42,32 @@ int fill_req(char *buf, struct http_req *req) {
 		strncpy(req->method, "GET", strlen("GET"));
 		a = strchr(buf, '/');
 		if ( a != NULL) { // есть запрашиваемый URI 
-			b = strchr(a, ' ');
+			b = strchr(a, '?');
 			if ( b != NULL ) { // конец URI
-				strncpy(req->uri, a, b-a);
+				strncpy(req->uri_path, a, b-a);
+				a = strchr (b, ' ');
+                		if ( a != NULL) {
+                        		strncpy (req->uri_params, b, a-b);
+                		}else {
+                        		return ERR_NO_URI; 
+                        		// тогда это что-то не то
+                		}
+
 			} else {
-				return ERR_ENDLESS_URI;  
-				// тогда это что-то не то
+				b = strchr(a, ' ');
+				if (b != 0) {
+					strncpy(req->uri, a, b-a);
+				} else {
+					return ERR_ENDLESS_URI;  
+					// тогда это что-то не то
+				}
 			}
 		} else {
-			return ERR_NO_URI; 
-			// тогда это что-то не то
-		}
-	}
+                        return ERR_NO_URI; 
+                        // тогда это что-то не то
+                }
 
+	
 	return 0;	
 }
 
@@ -65,7 +80,7 @@ int make_resp(struct http_req *req) {
 	printf("HTTP/1.1 200 OK\r\n");
 	printf("Content-Type: text/html\r\n");
 	printf("\r\n");
-	printf("<html><body><title>Page title</title><h1>Page Header</h1></doby></html>\r\n");
+	printf("<html><body><title>Page title</title><h1>Page Header</h1><h2>Method: %s</h2><h2>URI: %s</h2><h2>URI Parameters: %s<\h2></body></html>\r\n", req->method, req->uri, req->uri_params);
 	return 0;
 }
 
@@ -82,7 +97,7 @@ int main (void) {
 			break;
 		else
 			// какая-то ошибка 
-			printf("Error: %d\n", ret);
+			//printf("Error: %d\n", ret);
 		
 	}
 	log_req(&req);
