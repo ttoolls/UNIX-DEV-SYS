@@ -13,3 +13,5 @@ build/*
 myweb/myweb
 examples/access.log
 examples/syscall
+examples/mmf
+examples/readwrite
