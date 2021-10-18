@@ -72,7 +72,7 @@ int fill_req(char *buf, struct http_req *req) {
 }
 
 int log_req(struct http_req *req) {
-	// fprintf(stderr, "%s %s\n%s\n", req->request, req->method, req->uri);
+	fprintf(stderr, "%s %s\n%s\n", req->request, req->method, req->uri);
 	return 0;
 }
 
@@ -80,7 +80,13 @@ int make_resp(struct http_req *req) {
 	printf("HTTP/1.1 200 OK\r\n");
 	printf("Content-Type: text/html\r\n");
 	printf("\r\n");
+<<<<<<< HEAD
 	printf("<html><body><title>Page title</title><h1>Page Header</h><h2>Method: %s</h2><h2>URI: %s</h2><h2><h2>URI Path: %s</h2>URI Parameters: %s<\h2></body></html>\r\n", req->method, req->uri, req->uri_path, req->uri_params);
+=======
+	printf("<html><body><title>Page title</title><h1>Page Header</h1>");
+	printf("<p>Method: %s</p>",req->method);
+	printf("</body></html>\r\n");
+>>>>>>> d78cb9bac14c612d68b61a16abc8850026bf5d72
 	return 0;
 }
 
