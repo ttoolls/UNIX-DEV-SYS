@@ -33,6 +33,7 @@ struct http_req {
 };
 
 int fill_req(char *buf, struct http_req *req) {
+	fprintf(stderr,"REQ line: %s\n",buf);
 	if (strlen(buf) == 2) {
 		// пустая строка (\r\n) означает конец запроса
 		return REQ_END;
@@ -47,6 +48,7 @@ int fill_req(char *buf, struct http_req *req) {
 		// GET /test123?r=123 HTTP/1.1
 		// и т.п.
 		strncpy(req->request, buf, strlen(buf));
+		fprintf(stderr, "GET REQ: %s\n",req->request);
 		strncpy(req->method, "GET", strlen("GET"));
 		a = strchr(buf, '/');
 		if ( a != NULL) { // есть запрашиваемый URI 
@@ -70,11 +72,12 @@ int fill_req(char *buf, struct http_req *req) {
 
 int log_req(char* log_path, struct http_req *req) {
 	int fd;
-	char log_entry[LOG_ENTRY_LEN] = "Sample Log Entry";
+	char log_entry[LOG_ENTRY_LEN] = "Request: ";
 	if ((fd = open(log_path, O_WRONLY | O_CREAT | O_APPEND, 0600)) < 0) {
 		perror(log_path);
 		return 1;
 	}
+	strcat(log_entry, req->request);
 	if (write(fd, log_entry, strlen(log_entry)) != strlen(log_entry)) {
 		perror(log_path);
 		return 1;
@@ -117,6 +120,9 @@ int make_resp(char *base_path, struct http_req *req) {
 	write(1,http_contype,strlen(http_contype));
 	char *header_end = "\r\n";
 	write(1,header_end,strlen(header_end));
+	//printf("HTTP/1.1 200 OK\r\n");
+	//printf("Content-Type: text/html\r\n");
+	//printf("\r\n");
 	// Выводим запрошенный ресурс
         if (write(1,mmf_ptr,statbuf.st_size) != statbuf.st_size) {
                 perror("stdout");
