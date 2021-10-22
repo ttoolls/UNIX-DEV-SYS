@@ -14,7 +14,7 @@ int spawn(char *prog, char** args) {
 	}
 }
 int main() {
-	char* args[] = { "ls", "-l", "/", NULL };
+	char* args[] = { "ls", "-l", "/ake", NULL };
 	spawn("ls", args);
 	printf("main() finished\n");
 	return 0;
