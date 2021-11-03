@@ -48,3 +48,8 @@ examples/thread-detached
 examples/thread-self
 examples/thread-spec
 examples/thread-speclog
+examples/2waypipe
+examples/3fork
+examples/environ
+examples/argc
+
